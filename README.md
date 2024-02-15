@@ -8,7 +8,7 @@ git clone https://github.com/SamuelSGSouza/STC-converter.git
 
 ## Usage
 ```python
-from STC import STC
+from stc import STC
 
 stc = STC(start_word="computer", language="en")
 
@@ -34,7 +34,7 @@ Now, when you say "computer, write hello world", the program will print "hello w
 The start command is the word that the program will listen to start the command. For example, if you set the start command to "computer", the program will only listen to commands after you say "computer". You must say the start command before every command.
 #### Example
 ```python
-from STC import STC
+from stc import STC
 
 stc = STC(start_word="computer", language="en")
 
@@ -50,7 +50,7 @@ The language is the language that the program will listen to. At the moment, the
 
 #### Example
 ```python
-from STC import STC
+from stc import STC
 
 stc = STC(start_word="computer", language="en-US")
 
@@ -64,7 +64,7 @@ The add command method is used to add a command to the program. The function par
 
 #### Example
 ```python
-from STC import STC
+from stc import STC
 
 def open_file(file_name):
     with open(file_name, "r") as file:
@@ -83,7 +83,7 @@ As long as you add functions to the program, maybe you need to add functions wit
 When setting the STC object, you can set the context keyword that will be used to define the context of the command. The context keyword is optional and the default value is "using context". That way, when you say the start command, the program will listen to the context keyword to define the context of the command.
 #### Example
 ```python
-from STC import STC
+from stc import STC
 
 class OpenFile:
     def __init__(self, file_name):
@@ -95,8 +95,8 @@ class OpenFile:
 
 stc = STC(start_word="computer", language="en", context_keyword="use context")
 
-stc.add_command(function=OpenFile.open_file, commands=["open", "read", "show", "print"], context="open file")
+stc.add_command(function=OpenFile.open_file, commands=["open", "read", "show", "print"], context="open")
 
 ```
 Now, when you say "computer, use context open file, open file", the program will call the function. But if you say "computer, use context open file, print", the program will not do anything.
-**Importante:**: The context keyword can be one or more words, but it must be followed by the context of the command.
+**Importante:**: The context keyword must be one word and must be followed by the context of the command.
