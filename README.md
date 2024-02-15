@@ -1,5 +1,6 @@
 # STC-converter
-A python library that converts speak to python commands
+A python library that converts speak to python commands.
+**important**: The library is still in development and may not work as expected.
 
 ## Installation
 ```bash
