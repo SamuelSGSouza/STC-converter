@@ -1,13 +1,15 @@
-from STC import STC
+from stc import STC
 
-class OpenFile:
-    def __init__(self, file_name):
-        self.file_name = file_name
+def open_file(file_name):
+    with open(file_name, "r") as file:
+        print(file.read())
 
-    def open_file(self):
-        with open(self.file_name, "r") as file:
-            print(file.read())
+def printer(text):
+    print(text)
 
-stc = STC(start_word="computer", language="en", context_keyword="use context")
+stc = STC(start_command="computer", lang="en-US", context_definer="using")
 
-stc.add_command(function=OpenFile.open_file, commands=["open", "read", "show", "print"], context="open")
+stc.add_command(function=open_file, commands=["open", "read", "show"], context="file")
+stc.add_command(function=printer, commands=["print"], context="printer")
+
+stc.run()

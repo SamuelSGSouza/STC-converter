@@ -1,6 +1,5 @@
 from listenner import recognizer
 import time
-import re
 from unicodedata import normalize
 from difflib import SequenceMatcher
 import nltk
@@ -24,7 +23,7 @@ class STC:
         self.commands = []
         self.context_definer = context_definer
 
-    def add_command(self, context:str,function: callable,commands: list,) -> None:
+    def add_command(self, function: callable,commands: list,context:str="",) -> None:
         """
         Add a command to the list of commands
         :param context: str: The context of the function. It is the class where the function is defined
@@ -42,27 +41,51 @@ class STC:
         :return: str: The cleaned text
         """
         text = text.lower().strip()
-        text = re.sub("[^a-zA-Z0-9áéíóúÁÉÍÓÚâêîôÂÊÎÔãõÃÕçÇ: ]", "", text)
-        text = normalize("NFKD", text).encode("ASCII", "ignore").decode("ASCII")
+        # text = re.sub("[^a-zA-Z0-9áéíóúÁÉÍÓÚâêîôÂÊÎÔãõÃÕçÇ: ]", "", text)
+        # text = normalize("NFKD", text).encode("ASCII", "ignore").decode("ASCII")
 
         #removing stop words
         text = text.replace(self.start_command, "").strip()
-        stop_words = nltk.corpus.stopwords.words(self.verbose_langs[self.lang])
-        words = nltk.tokenize.word_tokenize(text)
-        words = [word for word in words if word not in stop_words]
-        text = " ".join(words)
+        # stop_words = nltk.corpus.stopwords.words(self.verbose_langs[self.lang])
+        # words = nltk.tokenize.word_tokenize(text)
+        # words = [word for word in words if word not in stop_words]
+        # text = " ".join(words)
 
         return text
 
-    def get_context(self,text:str) -> str:
+    def get_context(self,text:str) -> list:
         """
         Get the context of the command
         :param text: str: The text to be analyzed
-        :return: str: The context of the command
+        :return: str: The context of the command and the text without the context
         """
+        context = ""
         if self.context_definer in text:
-            return text.split(self.context_definer)[1].strip()
-        return ""
+            context = text.split(self.context_definer)[1].strip().split(" ")[0].strip()
+            text = text.replace(self.context_definer+" " + context, "").strip()
+        return [context, text]
+
+    def get_command(self,text:str, context: str) -> callable:
+        """
+        Get the command from the text
+        :param text: str: The text to be analyzed
+        :param possible_commands: list: The list of possible commands
+        :return: callable: The command to be executed
+        """
+        possible_commands = self.commands
+        if context:
+            possible_commands = [command for command in self.commands if SequenceMatcher(None, context, command["context"]).ratio() > 0.8]
+        
+        command = None
+        words = text.split(" ")
+        for possible_command in possible_commands:
+            for word in words:
+                if SequenceMatcher(None, word, possible_command["command"]).ratio() > 0.8:
+                    command = possible_command["function"]
+                    text = text.split(word)[1].strip()
+                    break
+        
+        return command, text
 
     def run(self) -> None:
         """
@@ -71,11 +94,17 @@ class STC:
         """
         while True:
             text = recognizer(self.lang)
+            print("Text: ", text)
             if text and text.lower().startswith(self.start_command):
                 cleanned_text = self.clean_text(text)
-                print(text)
-                print(cleanned_text)
+                context, cleanned_text = self.get_context(cleanned_text)
+                command, text = self.get_command(cleanned_text, context)
+                result = None
+                if command:
+                    result = command(text)
 
+                if type(result) == str:
+                    print(result)
             time.sleep(1)
         
          
