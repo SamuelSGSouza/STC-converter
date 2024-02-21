@@ -4,7 +4,7 @@ A python library that converts speak to python commands.
 
 ## Installation
 ```bash
-git clone https://github.com/SamuelSGSouza/STC-converter.git
+pip install stc-converter==0.1
 ```
 
 ## Usage
